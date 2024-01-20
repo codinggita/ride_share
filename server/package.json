@@ -1,0 +1,22 @@
+{
+  "name": "ride_share",
+  "version": "1.0.0",
+  "description": "Ride-sharing app that connects people heading to the same destination.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.2",
+    "express": "^4.18.2",
+    "mongoose": "^8.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
