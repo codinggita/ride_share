@@ -1,6 +1,8 @@
 # RideShare
 RideShare is a ride-sharing app that connects people heading to the same destination, allowing them to share rides and save money, reduce traffic, and protect the environment.
 
+[Api Documentation](https://documenter.getpostman.com/view/32434659/2s9YymFjCa#e3c94f2d-c0eb-424a-982c-fc94fef0d286)
+
 ### List of features:
   - **Profile management**: Allow users to view and edit their personal information, and preferences. 
   - **Flexible Rides**: Users can choose to be drivers, passengers, or both, offering flexibility and ride options.
