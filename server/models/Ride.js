@@ -18,7 +18,7 @@ const rideSchema = new mongoose.Schema({
     min: 1,
   },
   origin: {
-    type: {
+    place: {
       type: String, 
       required: true,
     },
@@ -27,7 +27,7 @@ const rideSchema = new mongoose.Schema({
     }, 
   },
   destination: {
-    type: {
+    place: {
       type: String,
       required: true,
     },
@@ -37,7 +37,7 @@ const rideSchema = new mongoose.Schema({
   },
   startTime: {
     type: Date,
-    required: true,c
+    required: true,
   },
   endTime: {
     type: Date,

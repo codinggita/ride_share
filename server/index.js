@@ -2,6 +2,10 @@ import express from "express"
 import dotenv from "dotenv"
 import mongoose from "mongoose"
 
+import authRoute from "./routes/auth.routes.js"
+import userRoute from "./routes/user.routes.js"
+import rideRoute from "./routes/ride.routes.js"
+
 const app = express()
 const PORT = 8080;
 
@@ -16,14 +20,23 @@ const connectDB = (url) => {
     .catch((error) => console.log(error));
 };
 
-
 //middlewares
 app.use(express.json())
 
-app.get('/', function (req, res) {
-  res.send('Testing APIs')
-})
+app.use("/api/users", userRoute);
+app.use("/api/auth", authRoute);
+app.use("/api/rides", rideRoute);
 
+
+app.use((err, req, res, next)=>{
+  const errorStatus = err.status || 500;
+  const errorMessage = err.message || "Something went wrong";
+  return res.status(errorStatus).json({
+    success: false,
+    status: err.status,
+    error: errorMessage
+  })
+})
 
 app.listen(PORT, () => {
   connectDB()
