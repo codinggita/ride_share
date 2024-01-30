@@ -1,9 +1,11 @@
-import Header from "@/components/Header"
+import Features from "@/sections/Features"
+import Hero from "@/sections/Hero"
 
 const Home = () => {
   return (
     <>
-      <Header />
+      <Hero />
+      <Features />
     </>
   )
 }
