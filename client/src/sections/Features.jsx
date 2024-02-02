@@ -19,8 +19,8 @@ const Features = () => {
     }
   ]
   return (
-    <section className="text-foreground container max-w-screen-xl">
-      <div className="md:px-5 py-16 mx-auto">
+    <section className="text-foreground container max-w-screen-xl px-3 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+      <div className="md:px-5 py-16 sm:py-0 mx-auto">
         <div className="flex flex-wrap">
           {features.map(f => 
             <div className="md:w-1/3 flex rounded-lg h-full p-6 flex-col" key={f.title}>
