@@ -6,6 +6,7 @@ import OfferSeat from './pages/OfferSeat'
 import Footer from './components/Footer'
 import SearchPage from './pages/SearchPage'
 import Error from './pages/Error'
+import RideDetail from './pages/RideDetail'
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
       <Route path="/*" element={<Error />} />
       <Route path="/search" element={<SearchPage />} />
       <Route path="/offer-seat" element={<OfferSeat />} />
+      <Route path="/ride/:rideId" element={<RideDetail />} />
     </Routes>
     <Footer />
     </>
