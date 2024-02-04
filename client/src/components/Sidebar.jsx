@@ -34,30 +34,31 @@ const Sidebar = () => {
   ]
   
   return (
-    <aside className="hidden relative lg:block">
-      <div className="sticky top-16 space-y-4 py-4">
-        <div className="px-3 py-2">
+    <aside className="space-y-4 py-4">
+      <div className="px-3 py-2">
+        <div className="flex items-center justify-between">
           <h2 className="mb-2 px-4 text-lg font-semibold">Sort by</h2>
-          <RadioGroup defaultValue="option-one">
-            {sortBy.map(s => 
-              <Label key={s.title} htmlFor={s.title} className="flex gap-2 items-center justify-between rounded-md bg-popover p-4 hover:bg-accent hover:text-accent-foreground">
-                {s.icon}
-                {s.title}
-                <RadioGroupItem value={s.title} className="ml-auto" id={s.title} />
-              </Label>
-            )}
-          </RadioGroup>
+          <span className="mb-2 px-4 text-sm text-primary text-right underline cursor-pointer">Clear Filter</span>
         </div>
-
-        <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold">Departure time</h2>
-          {departureTime.map(d => 
-            <Label key={d.title} htmlFor={d.name} aria-label={d.name} className="flex gap-2 items-center justify-between rounded-md bg-popover p-4 hover:bg-accent hover:text-accent-foreground">
-              {d.title}
-              <Checkbox name={d.name} id={d.name} />
+        <RadioGroup>
+          {sortBy.map(s => 
+            <Label key={s.title} htmlFor={s.title} className="flex gap-2 items-center justify-between rounded-md bg-popover p-4 hover:bg-accent hover:text-accent-foreground">
+              {s.icon}
+              {s.title}
+              <RadioGroupItem value={s.title} className="ml-auto" id={s.title} />
             </Label>
           )}
-        </div>
+        </RadioGroup>
+      </div>
+
+      <div className="px-3 py-2">
+        <h2 className="mb-2 px-4 text-lg font-semibold">Departure time</h2>
+        {departureTime.map(d => 
+          <Label key={d.title} htmlFor={d.name} aria-label={d.name} className="flex gap-2 items-center justify-between rounded-md bg-popover p-4 hover:bg-accent hover:text-accent-foreground">
+            {d.title}
+            <Checkbox name={d.name} id={d.name} />
+          </Label>
+        )}
       </div>
     </aside>
   )
