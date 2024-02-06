@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   profilePicture: {
     type: String,
-    default : "user.png"
+    trim: true,
   },
   age:{
     type: Number,
@@ -44,6 +44,26 @@ const userSchema = new mongoose.Schema({
       ref: 'Ride',
     },
   ],
+  profile: {
+    bio: {
+      type: String,
+      trim: true,
+    },
+    preferences: {
+      smoking: {
+        type: String,
+        enum: ['No preference', 'Smoke-free only', 'Okay with smoking'],
+      },
+      music: {
+        type: String,
+        enum: ['No preference', 'Quiet ride', 'Music welcome'],
+      },
+      petFriendly: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  },
   stars: {
     type: Number,
     max: 5,

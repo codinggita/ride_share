@@ -22,8 +22,8 @@ export const getAllUsers = async(req, res, next)=>{
 
 export const updateUser = async (req, res, next) => {
   try {
-    const { name, phoneNumber, profilePicture, age, vehicleDetails } = req.body;
-    const updateUser = await User.findByIdAndUpdate(
+    const { name, phoneNumber, profilePicture, age, profile } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       {
         $set: {
@@ -31,12 +31,11 @@ export const updateUser = async (req, res, next) => {
           phoneNumber,
           profilePicture,
           age,
-          vehicleDetails,
-          updatedAt: Date.now(),
+          profile
       }},
       {new:true, select: '-password'}    
     )
-    res.status(200).json(updateUser)
+    res.status(200).json(updatedUser)
   }catch (err) {
     next(err)
   }
