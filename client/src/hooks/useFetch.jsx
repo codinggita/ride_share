@@ -27,8 +27,24 @@ const useFetch = (endpoint) => {
       })
     
   }, [url])
+
+  function refetch(){
+    setLoading(true)
+    
+    axios
+      .get(url)
+      .then((response) => {
+        setData(response.data)
+      })
+      .catch((err) => {
+        setError(err.response ? err.response.data : err.message)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
   
-  return { data, loading, error }
+  return { data, loading, error, refetch }
 }
 
 export default useFetch

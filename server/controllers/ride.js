@@ -1,4 +1,5 @@
 import Ride from "../models/Ride.js"
+import User from "../models/User.js"; 
 
 export const getRide = async (req, res, next) => {
   try{
@@ -42,6 +43,7 @@ export const createRide = async (req, res, next) =>{
   try{
     const newRide = new Ride(req.body);
     await newRide.save()
+    await User.findByIdAndUpdate(req.body.creator, { $push: { ridesCreated: newRide._id } });
     res.status(201).send(newRide)
   }catch(err){
     next(err);

@@ -1,22 +1,22 @@
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns";
-import { CalendarIcon, Minus, Plus } from "lucide-react";
+import axios from "axios";
+import { Minus, Plus } from "lucide-react";
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { Toaster } from "./ui/sonner";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   from: z.string(),
   to: z.string(),
   seat: z.number().min(1).max(10),
-  date: z.date().min(new Date()),
-  time: z.string()
+  price: z.number().nonnegative(),
+  startTime: z.date().min(new Date()),
+  endTime: z.date().min(new Date())
 })
 
 
@@ -27,13 +27,32 @@ const PublishCard = () => {
       from: "",
       to: "",
       seat: 1,
-      date: new Date(),
-      time: "",
+      price: 0,
+      startTime: new Date(),
+      endTime: new Date(),
     },
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      const body = {
+        "creator": "65c30725592bf64de69981c1",
+        "availableSeats": data.seat,
+        "origin": {
+          "place": data.from,
+        },
+        "destination": {
+          "place": data.to,
+        },
+        "startTime": data.startTime,
+        "endTime": data.endTime,
+        "price": data.price
+      }
+      await axios.post('https://rideshare-03wo.onrender.com/api/rides', body);
+      toast("The ride has been Created")
+    } catch (error) {
+      console.error('POST request failed:', error);
+    }
   };
 
   return (
@@ -72,71 +91,70 @@ const PublishCard = () => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="seat"
-            render={({ field }) => (
-              <FormItem className="flex flex-col space-y-1.5">
-                <FormLabel>Available seats</FormLabel>
-                <FormControl>
-                  <div className="flex gap-2 items-center">
-                    <Button variant="outline" size="icon" onClick={() => field.value>1 && field.onChange(field.value - 1)}>
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span>{field.value}</span>
-                    <Button variant="outline" size="icon" onClick={() => field.value<10 && field.onChange(field.value + 1)}  >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="time"
-            render={({ field }) => (
-              <FormItem className="flex flex-col space-y-1.5">
-                <FormLabel>Time</FormLabel>
-                <FormControl>
-                  <Input type="time" required placeholder="time" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button variant={"ghost"} className={cn(" px-0 hover:bg-transparent justify-start", !field.value && "text-muted-foreground" )}>
-                        <CalendarIcon size={20} className="opacity-50 mr-1" />
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
+          <div className="flex gap-24">
+            <FormField
+              control={form.control}
+              name="seat"
+              render={({ field }) => (
+                <FormItem className="flex flex-col space-y-1.5">
+                  <FormLabel>Available seats</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-2 items-center">
+                      <Button variant="outline" size="icon" onClick={() => field.value>1 && field.onChange(field.value - 1)}>
+                        <Minus className="h-4 w-4" />
                       </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date() 
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                      <span>{field.value}</span>
+                      <Button variant="outline" size="icon" onClick={() => field.value<10 && field.onChange(field.value + 1)}  >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem className="flex flex-col space-y-1.5">
+                  <FormLabel>Price</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Price" min="0" {...field} onChange={(event) => field.onChange(Number(event.target.value))} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="startTime"
+            render={({ field }) => (
+              <FormItem className="flex flex-col space-y-1.5">
+                <FormLabel>Departure Time</FormLabel>
+                <FormControl>
+                  <Input type="datetime-local" placeholder="Departure time" {...field} 
+                    value={field.value ? field.value.toISOString().slice(0, 16) : ''}
+                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />  
+          <FormField
+            control={form.control}
+            name="endTime"
+            render={({ field }) => (
+              <FormItem className="flex flex-col space-y-1.5">
+                <FormLabel>Arrival Time</FormLabel>
+                <FormControl>
+                  <Input type="datetime-local" placeholder="Arrival time" {...field} 
+                    value={field.value ? field.value.toISOString().slice(0, 16) : ''}
+                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -145,6 +163,7 @@ const PublishCard = () => {
         </form>
       </Form>
       </CardContent>
+      <Toaster />
     </Card>
   )
 }
