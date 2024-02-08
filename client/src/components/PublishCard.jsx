@@ -100,11 +100,11 @@ const PublishCard = () => {
                   <FormLabel>Available seats</FormLabel>
                   <FormControl>
                     <div className="flex gap-2 items-center">
-                      <Button variant="outline" size="icon" onClick={() => field.value>1 && field.onChange(field.value - 1)}>
+                      <Button variant="outline" size="icon" type="button" onClick={() => field.value>1 && field.onChange(field.value - 1)}>
                         <Minus className="h-4 w-4" />
                       </Button>
                       <span>{field.value}</span>
-                      <Button variant="outline" size="icon" onClick={() => field.value<10 && field.onChange(field.value + 1)}  >
+                      <Button variant="outline" size="icon" type="button" onClick={() => field.value<10 && field.onChange(field.value + 1)}  >
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
