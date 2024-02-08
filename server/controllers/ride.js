@@ -3,8 +3,12 @@ import User from "../models/User.js";
 
 export const getRide = async (req, res, next) => {
   try{
-    const ride = await Ride.findById(req.params.id)
-    res.status(200).json(ride._doc); 
+    const ride = await Ride.findById(req.params.id).populate('creator', 'name age stars rating profile ridesCreated createdAt').lean(); 
+    if (!ride) {
+      return res.status(404).json({ message: 'Ride not found' });
+    }
+
+    res.status(200).json(ride); 
   }catch(err){
     next(err);
   }
@@ -69,6 +73,7 @@ export const updateRide = async(req, res, next) => {
 export const deleteRide = async(req, res, next) => {
   try{
     await Ride.findByIdAndDelete(req.params.id);
+    User.findOneAndUpdate({ _id: req.body.creator },{ $pull: { ridesCreated: req.params.id } })
     res.status(200).send("ride has been deleted");
   }catch(err){
     next(err)
