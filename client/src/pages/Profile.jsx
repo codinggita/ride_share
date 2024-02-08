@@ -12,6 +12,7 @@ import { Pencil, Star, Trash } from "lucide-react"
 import { Fragment, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
+const apiUri = import.meta.env.VITE_REACT_API_URI
 
 const Profile = () => {
 
@@ -28,7 +29,7 @@ const Profile = () => {
 
   const onSubmit = async (newData) => {
     try {
-      await axios.patch('https://rideshare-03wo.onrender.com/api/users/65c30725592bf64de69981c1', {
+      await axios.patch(`${apiUri}/users/65c30725592bf64de69981c1`, {
         name: newData.name,
         profile: {...data.profile,
           bio: newData.bio,
@@ -44,9 +45,8 @@ const Profile = () => {
   const {loading, data, refetch} = useFetch(`users/65c30725592bf64de69981c1`)
 
   async function handleDelete(id){
-    console.log(id)
     try {
-      await axios.delete(`https://rideshare-03wo.onrender.com/api/rides/${id}`);
+      await axios.delete(`${apiUri}/rides/${id}`);
       refetch();
       toast("The ride has been Deleted")
     } catch (error) {

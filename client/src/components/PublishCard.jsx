@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Toaster } from "./ui/sonner";
 import { toast } from "sonner";
+const apiUri = import.meta.env.VITE_REACT_API_URI
 
 const formSchema = z.object({
   from: z.string(),
@@ -48,7 +49,7 @@ const PublishCard = () => {
         "endTime": data.endTime,
         "price": data.price
       }
-      await axios.post('https://rideshare-03wo.onrender.com/api/rides', body);
+      await axios.post(`${apiUri}/rides`, body);
       toast("The ride has been Created")
     } catch (error) {
       console.error('POST request failed:', error);
