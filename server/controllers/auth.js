@@ -1,39 +1,78 @@
 import bcrypt from "bcryptjs"
 import User from "../models/User.js"
 import {createError} from "../utils/error.js"
+import jwt from "jsonwebtoken"
 
 export const register = async (req, res, next) => {
+  const {name, email, password} = req.body;
+  const userExists = await User.findOne({ email });
+  if (userExists) return res.status(400).json({message:"Email already exists"});
+
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(password, salt);
   try{
-    const {name, email, password} = req.body;
-    const userExists = await User.findOne({ email });
-    if (userExists) return res.status(200).send("Email already exist.");
-
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(password, salt);
-
     const newUser = new User({
       name: name,
       email: email,
       password: hash
     })
     await newUser.save();
-    res.status(201).send("User has been created")
+    
+    const accessToken = jwt.sign({ id: newUser._id, isAdmin: newUser.isAdmin }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+      sameSite: 'strict' 
+    };
+
+    const { password, isAdmin, ...otherDetails } = newUser._doc;
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .json({ user: { ...otherDetails }, isAdmin });
   }catch(err){
     next(err);
   }
 }
 
 export const login = async(req, res, next)=>{
-  const user = await User.findOne({email: req.body.email})
-  if(!user) 
-    return next(createError(404, "User not found"))
+  try{
+    const user = await User.findOne({email: req.body.email})
 
-  const isPasswordCorrect = await bcrypt.compare(
-    req.body.password, user.password
-  )
+    if (!user || !await bcrypt.compare(req.body.password, user.password)) {
+      return next(createError(401, "Wrong Email and Password"))
+    }
+    const accessToken = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
 
-  if(!isPasswordCorrect) 
-    return next(createError(401, "Wrong Email and Password"))
+    const options = {
+      httpOnly: true,
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+      sameSite: 'strict' 
+    };
 
-  res.status(200).send("Login successfull")
+    const { password, isAdmin, ...otherDetails } = user._doc;
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .json({ user: { ...otherDetails }, isAdmin });
+
+  }catch(err){
+    next(err);
+  }
 }
+
+export const logout = async (req, res, next) => {
+  try{
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict"
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    next(err);
+  }
+};
