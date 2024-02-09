@@ -1,14 +1,15 @@
 import express from "express";
 import { createRide, getAllRides, getRide, updateRide, deleteRide, findRides } from "../controllers/ride.js";
+import { verifyAdmin, verifyToken, verifyUser } from "../utils/verifyToken.js";
 
 const router = express.Router()
 
-router.get("/", getAllRides)
-router.post("/", createRide)
+router.get("/", verifyAdmin, getAllRides)
+router.post("/", verifyToken, createRide)
 router.get("/find", findRides)
 
 router.get("/:id", getRide)
-router.patch("/:id", updateRide)
-router.delete("/:id", deleteRide)
+router.patch("/:id", verifyUser, updateRide)
+router.delete("/:id", verifyUser, deleteRide)
 
 export default router
