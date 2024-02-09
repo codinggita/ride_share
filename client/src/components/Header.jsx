@@ -4,9 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage  } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Search, PlusCircle, LogOut, User } from "lucide-react";
 import LoginSignupDialog from "./LoginSignupDialog";
+import { AuthContext } from "@/context/AuthContext";
+import { useContext } from "react";
 
 const Header = () => {
-  const isGuest = false;
+  const {user} = useContext(AuthContext)
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background mx-auto flex p-3 lg:px-16 items-center justify-end">
@@ -18,13 +20,13 @@ const Header = () => {
         <NavLink to="/search" className="flex items-center gap-2 mr-5 hover:text-primary"><Search className="h-4 w-4" />Search</NavLink>
         <NavLink to="/offer-seat" className="flex items-center gap-2 mr-5 hover:text-primary"> <PlusCircle className="h-4 w-4"/> Publish a ride</NavLink>
       </nav>
-      {isGuest ?
+      {!user ?
         <LoginSignupDialog />
         :
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarImage src={user.profilePicture || "https://github.com/shadcn.png"} />
               <AvatarFallback>Profile</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>

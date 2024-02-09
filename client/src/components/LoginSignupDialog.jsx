@@ -4,8 +4,41 @@ import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Button } from "./ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { useContext, useState } from "react"
+import { AuthContext } from "@/context/AuthContext"
+import axios from "axios"
+
+const apiUri = import.meta.env.VITE_REACT_API_URI
 
 const LoginSignupDialog = () => {
+  const { loading, error, dispatch } = useContext(AuthContext);
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [signupData, setSignupData] = useState({ username: "", email: "", password: "" });
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    dispatch({ type: 'LOGIN_START' });
+    try{
+      const res = await axios.post(`${apiUri}/auth/login`, loginData)
+      dispatch({type:"LOGIN_SUCCESS", payload: res.data})
+    }catch(err){
+      dispatch({type: "LOGIN_FAILED", payload: err.response.data})
+    }
+  };
+
+
+  const handleSignup = async (event) => {
+    event.preventDefault();
+    dispatch({ type: 'LOGIN_START' });
+    try{
+      const res = await axios.post(`${apiUri}/auth/register`, signupData)
+      dispatch({type:"LOGIN_SUCCESS", payload: res.data})
+    }catch(err){
+      dispatch({type: "LOGIN_FAILED", payload: err.response.data})
+    }
+  };
+
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -17,55 +50,56 @@ const LoginSignupDialog = () => {
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">SignUp</TabsTrigger>
             </TabsList>
+            {error && <span className="text-destructive">{error?.message}</span> }
             <TabsContent value="login">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Login</CardTitle>
-                  <CardDescription>
-                    Welcome back
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="space-y-1">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="password">Password</Label>
-                    <Input id="password"/>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button>Log in</Button>
-                </CardFooter>
-              </Card>
+              <form onSubmit={handleLogin}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Login</CardTitle>
+                    <CardDescription>Welcome back</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" type="email" value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="password">Password</Label>
+                      <Input id="password" type="password" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} />
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant={loading ? 'disable' : 'default'} type="submit">Log in</Button>
+                  </CardFooter>
+                </Card>
+              </form>
             </TabsContent>
             <TabsContent value="signup">
+            <form onSubmit={handleSignup}>
               <Card>
                 <CardHeader>
                   <CardTitle>Signup</CardTitle>
-                  <CardDescription>
-                    Create a new account.
-                  </CardDescription>
+                  <CardDescription>Create a new account.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="space-y-1">
                     <Label htmlFor="username">Name</Label>
-                    <Input id="username" />
+                    <Input id="username" value={signupData.username} onChange={(e) => setSignupData({ ...signupData, username: e.target.value })} />
                   </div>
                   <div className="space-y-1">
                     <Label htmlFor="newemail">Email</Label>
-                    <Input id="newemail"/>
+                    <Input id="newemail" type="email" value={signupData.email} onChange={(e) => setSignupData({ ...signupData, email: e.target.value })} />
                   </div>
                   <div className="space-y-1">
                     <Label htmlFor="newpassword">Password</Label>
-                    <Input id="newpassword" type="password" />
+                    <Input id="newpassword" type="password" value={signupData.password} onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} />
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button>Sign up</Button>
+                  <Button variant={loading ? 'disable' : 'default'} type="submit">Sign up</Button>
                 </CardFooter>
               </Card>
+            </form>
             </TabsContent>
           </Tabs>
         </DialogContent>
