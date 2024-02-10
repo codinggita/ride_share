@@ -26,16 +26,20 @@ export const getAllRides = async (req, res, next) => {
 export const findRides = async (req, res, next) => {
   try {
     const { from, to, seat, date } = req.query;
-    if (!from || !to || !seat) {
+    
+    if (!from || !to || !seat || !date) {
         return res.status(400).json({ message: 'Please provide all the details' });
     }
+    const searchDate = new Date(date)
+    searchDate.setHours(0, 0, 0, 0); // Set to midnight of the specified date
+
     const rides = await Ride.find({
         'origin.place': new RegExp(from, 'i'),
         'destination.place': new RegExp(to, 'i'),
         'availableSeats': { $gte: seat},
-        // 'startTime': date 
+        'startTime': { $gte: searchDate.toISOString(), $lt: new Date(searchDate.getTime() + 24 * 60 * 60 * 1000).toISOString() } // Filter rides up to next midnight
     })
-    .populate('creator', 'name stars') 
+    .populate('creator', 'name profilePicture stars') 
     .lean(); 
     res.status(200).json({ success: true, rides });
   } catch (err) {
@@ -45,10 +49,10 @@ export const findRides = async (req, res, next) => {
 
 export const createRide = async (req, res, next) =>{
   try{
-    const newRide = new Ride(req.body);
+    const newRide = new Ride({...req.body, creator: req.user.id});
     await newRide.save()
-    await User.findByIdAndUpdate(req.body.creator, { $push: { ridesCreated: newRide._id } });
-    res.status(201).send(newRide)
+    await User.findByIdAndUpdate(req.user.id, { $push: { ridesCreated: newRide._id } });
+    res.status(201).json(newRide)
   }catch(err){
     next(err);
   }
@@ -73,7 +77,7 @@ export const updateRide = async(req, res, next) => {
 export const deleteRide = async(req, res, next) => {
   try{
     await Ride.findByIdAndDelete(req.params.id);
-    User.findOneAndUpdate({ _id: req.body.creator },{ $pull: { ridesCreated: req.params.id } })
+    await User.findByIdAndUpdate( req.user.id, { $pull: { ridesCreated: req.params.id } })
     res.status(200).send("ride has been deleted");
   }catch(err){
     next(err)
