@@ -10,6 +10,6 @@ router.get("/find", findRides)
 
 router.get("/:id", getRide)
 router.patch("/:id", verifyUser, updateRide)
-router.delete("/:id", verifyUser, deleteRide)
+router.delete("/:id", verifyToken, deleteRide)
 
 export default router

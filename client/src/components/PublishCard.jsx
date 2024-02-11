@@ -37,7 +37,6 @@ const PublishCard = () => {
   const onSubmit = async (data) => {
     try {
       const body = {
-        "creator": "65c30725592bf64de69981c1",
         "availableSeats": data.seat,
         "origin": {
           "place": data.from,
@@ -49,8 +48,9 @@ const PublishCard = () => {
         "endTime": data.endTime,
         "price": data.price
       }
-      await axios.post(`${apiUri}/rides`, body);
+      await axios.post(`${apiUri}/rides`, body, {withCredentials: true});
       toast("The ride has been Created")
+      form.reset()
     } catch (error) {
       console.error('POST request failed:', error);
     }
