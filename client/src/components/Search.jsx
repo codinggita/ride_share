@@ -16,7 +16,7 @@ const searchSchema = z.object({
   from: z.string(),
   to: z.string(),
   seat: z.number().min(1).max(10),
-  date: z.date().min(new Date()),
+  date: z.date(),
 })
 
 const Search = () => {
@@ -25,20 +25,22 @@ const Search = () => {
   const form = useForm({
     resolver: zodResolver(searchSchema),
     defaultValues: {
-      from: searchParams.get("from"),
-      to: searchParams.get("to"),
-      seat: parseInt(searchParams.get("seat"))<11?parseInt(searchParams.get("seat")):1,
-      date: searchParams.get("date") 
+      from: searchParams.get("from") || "", // Ensure default value is an empty string if not found
+      to: searchParams.get("to") || "", // Ensure default value is an empty string if not found
+      seat: parseInt(searchParams.get("seat")) >= 1 && parseInt(searchParams.get("seat")) <= 10 ? parseInt(searchParams.get("seat")) : 1, // Ensure seat is between 1 and 10
+      date: searchParams.get("date") ? new Date(searchParams.get("date")) : null // Convert date string to Date object or null if not found
     },
   });
 
-  const onSubmit = (data) => {
-    setSearchParams(data)
+  const onSubmit = async (data) => {
+    await form.handleSubmit((formData) => {
+      setSearchParams(formData, {replace: true});
+    })(data);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-1 sm:flex-row w-full sm:w-fit divide-y sm:divide-y-0 sm:divide-x bg-background border p-3 rounded-lg">
+      <form onSubmit={onSubmit} className="flex flex-col gap-1 sm:flex-row w-full sm:w-fit divide-y sm:divide-y-0 sm:divide-x bg-background border p-3 rounded-lg">
         <div className="flex ">
           <FormField
             control={form.control}
@@ -92,7 +94,7 @@ const Search = () => {
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date < new Date() 
+                          date < new Date().setHours(0, 0, 0, 0)
                         }
                         initialFocus
                       />
