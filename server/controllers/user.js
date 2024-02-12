@@ -3,7 +3,7 @@ import User from  "../models/User.js"
 // Get user details
 export const getUser = async (req, res, next) => {
   try{
-    const user = await User.findById(req.params.id).populate('ridesCreated').lean();
+    const user = await User.findById(req.params.id).populate('ridesCreated ridesJoined').lean();
     const {email, password, updatedAt, ...detail} = user
     res.status(200).json(detail); 
   }catch(err){

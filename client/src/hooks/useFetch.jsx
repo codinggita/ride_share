@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 const baseURL = import.meta.env.VITE_REACT_API_URI;
 // const baseURL = "http://localhost:8080/api";
 
-const useFetch = (endpoint) => {
+const useFetch = (endpoint, includeCredentials = false) => {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
@@ -13,9 +13,9 @@ const useFetch = (endpoint) => {
 
   useEffect(() => {
     setLoading(true)
-    
+    const axiosConfig = includeCredentials ? { withCredentials: true } : {};
     axios
-      .get(url)
+      .get(url, axiosConfig)
       .then((response) => {
         setData(response.data)
       })
@@ -26,13 +26,13 @@ const useFetch = (endpoint) => {
         setLoading(false)
       })
     
-  }, [url])
+  }, [url, includeCredentials])
 
   function refetch(){
     setLoading(true)
-    
+    const axiosConfig = includeCredentials ? { withCredentials: true } : {};
     axios
-      .get(url)
+      .get(url, axiosConfig)
       .then((response) => {
         setData(response.data)
       })
