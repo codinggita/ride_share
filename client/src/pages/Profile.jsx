@@ -153,17 +153,13 @@ const Profile = () => {
 
           <div className="flex mt-5 justify-between items-center w-full">
             <h1 className="text-xl font-semibold">Recently joined rides</h1>
-            <Pencil className={`cursor-pointer p-1 rounded-lg ${rideDeleteMode && 'bg-primary text-primary-foreground'} `} size={25} onClick={() => setRideDeleteMode(!rideDeleteMode)} />
           </div>
           <ScrollArea className="h-[275px] w-full rounded-md border p-4">
             {data?.ridesJoined.length === 0
               ? <h3>No rides</h3>
               :
               data?.ridesJoined.map(ride => 
-                <Fragment key={ride._id} >
-                  <RideCard details={ride} />
-                  { rideDeleteMode && <Trash className="text-destructive cursor-pointer" onClick={()=> handleDelete(ride._id)} />}
-                </Fragment>
+              <RideCard key={ride._id} details={ride} />
             )}
           </ScrollArea>
         </div>

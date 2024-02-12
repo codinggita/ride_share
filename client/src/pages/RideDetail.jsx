@@ -8,15 +8,23 @@ import { MoveDown, MoveRight, Star } from "lucide-react"
 import { useParams } from "react-router-dom"
 import { toast } from "sonner"
 import { format, formatDistance } from "date-fns";
+import axios from "axios"
+
+const apiUri = import.meta.env.VITE_REACT_API_URI
 
 const RideDetail = () => {
   const { rideId } = useParams();
   const { loading, data, error } = useFetch(`rides/${rideId}`);
 
-  const handleBook = () => {
-    toast("Your ride has been booked successfully", {
-      description: format(new Date(), "PPp"),
-    });
+  const handleBook = async() => {
+    try{
+      const res = await axios.get(`${apiUri}/rides/${rideId}/join`, {withCredentials: true})
+      toast(res, {
+        description: format(new Date(), "PPp"),
+      });
+    }catch(err){
+      console.log(err)
+    }
   };
 
   if (loading) {
@@ -80,8 +88,8 @@ const RideDetail = () => {
             <div className="flex flex-col justify-start items-start flex-shrink-0">
               <div className="flex w-full space-x-4 py-8 border-b">
                 <Avatar>
-                  <AvatarImage src={data?.profilePicture || "https://github.com/shadcn.png"}/>
-                  <AvatarFallback>Profile</AvatarFallback>
+                  <AvatarImage src={data?.profilePicture}/>
+                  <AvatarFallback className="select-none text-primary text-xl font-bold">{data?.creator.name[0]}</AvatarFallback>
                 </Avatar>
                 <div className="flex justify-center items-start flex-col space-y-2">
                   <p className="text-base font-semibold leading-4 text-left">{data?.creator.name}</p>

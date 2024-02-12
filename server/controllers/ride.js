@@ -47,6 +47,32 @@ export const findRides = async (req, res, next) => {
   }
 }
 
+export const joinRide = async (req, res, next) =>{
+  try{
+    const ride = await Ride.findById(req.params.id);
+
+    if (ride.passengers.includes(req.user.id)) {
+      res.status(400).json('You already joined this ride!');
+    }
+    if (ride.passengers.length >= ride.availableSeats) {
+      res.status(400).json('Ride is full!');
+    }
+
+    await Ride.updateOne(
+      { _id: ride._id },
+      { $push: { passengers: req.user.id }, $inc: { availableSeats: -1 } }
+    ),
+    await User.updateOne(
+      { _id: req.user.id },
+      { $push: { ridesJoined: ride._id } }
+    ),
+
+    res.status(200).json({ message: 'Successfully joined the ride!' });
+  }catch(err){
+    next(err);
+  }
+}
+
 export const createRide = async (req, res, next) =>{
   try{
     const newRide = new Ride({...req.body, creator: req.user.id});

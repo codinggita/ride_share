@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs"
 import User from "../models/User.js"
-import {createError} from "../utils/error.js"
 import jwt from "jsonwebtoken"
 
 export const register = async (req, res, next) => {
@@ -42,7 +41,7 @@ export const login = async(req, res, next)=>{
     const user = await User.findOne({email: req.body.email})
 
     if (!user || !await bcrypt.compare(req.body.password, user.password)) {
-      return next(createError(401, "Wrong Email and Password"))
+      return res.status(400).json({message:"Wrong email or password"});
     }
     const accessToken = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
 
@@ -69,7 +68,6 @@ export const logout = async (req, res, next) => {
     res.clearCookie("accessToken", {
       httpOnly: true,
       secure: true,
-      sameSite: "strict"
     });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
